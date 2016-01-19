@@ -1,0 +1,75 @@
+---
+- name: Schoolsite Feature Migrate
+  hosts: all
+  sudo: yes
+  
+  vars_files:
+    - vars/schools.yml
+    - vars/apache.yml
+    - vars/php.yml
+    - vars/mysql.yml
+  
+  vars:
+    drush_version: 7.x
+  
+  roles:
+    - role: geerlingguy.apache
+    - role: geerlingguy.mysql
+    - role: geerlingguy.php
+    - role: geerlingguy.drush
+
+  pre_tasks:
+    - name: Format a list of the school shortnames to make vhosts
+      set_fact:
+        vhost:
+          servername: "{{ item }}.schools.dev"
+          documentroot: "/var/www/schools/{{ item }}"
+      with_items: "{{ school_shortnames }}"
+      register: vhost_result
+        
+    - name: Set the vhosts from school shortnames
+      set_fact: 
+        apache_vhosts: "{{ vhost_result.results | map(attribute='ansible_facts.vhost') | list }}"
+  tasks:
+    - name: Create a symbolic for the school sites
+      file: src=/vagrant/data dest=/var/www/schools state=link
+      notify: restart apache
+      
+    - name: Remove databases
+      mysql_db: 
+        state: absent 
+        name: "{{ item }}"
+        login_user: root
+        login_password: root
+      with_items: "{{ school_shortnames }}"
+      
+    - name: Create databases
+      mysql_db: 
+        state: present 
+        name: "{{ item }}"
+        login_user: root
+        login_password: root
+      with_items: "{{ school_shortnames }}"
+      
+    - name: Import databases
+      mysql_db:
+        state: import
+        name: "{{ item }}"
+        target: /vagrant/database/{{ item }}.bak.sql.gz
+        login_user: root
+        login_password: root
+      with_items: "{{ school_shortnames }}"
+    
+    - name: Write settings files
+      template:
+        src: templates/settings.php.j2
+        dest: /var/www/schools/{{ item }}/sites/default/settings.php
+      with_items: "{{ school_shortnames }}"
+      
+    - name: Update the admin passwords
+      command: drush upwd 
+        --password="admin" 
+        --root="/var/www/schools/{{ item }}" 
+        --uri="http://{{ item }}.schools.dev"
+        "admin"
+      with_items: "{{ school_shortnames }}"

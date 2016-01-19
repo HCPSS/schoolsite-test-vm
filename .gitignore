@@ -1,0 +1,9 @@
+.vagrant/
+nbproject/
+
+/database/*
+/data/*
+
+!/database/README.md
+!/data/README.md
+
