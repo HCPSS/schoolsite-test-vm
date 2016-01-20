@@ -175,5 +175,5 @@ This is a script that is meant to be run from the guest. It resets a school to
 it's original state when it was imported:
 
 ```
-/vagrant/utilities/reset_school.py bses
+$ /vagrant/utilities/reset_school.py bses
 ```
