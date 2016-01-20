@@ -1,5 +1,7 @@
 .vagrant/
 nbproject/
+.project
+.pydevproject
 
 /database/*
 /data/*
