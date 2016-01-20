@@ -168,3 +168,12 @@ Which is what ansible will expect. Here's an example:
 ```
 $ ./utilities/process_backup.py -b ~/Downloads/2016-01-15/ -d ~/Sites/schoolsite-test-vm/
 ```
+
+### reset_school.py
+
+This is a script that is meant to be run from the guest. It resets a school to
+it's original state when it was imported:
+
+```
+/vagrant/utilities/reset_school.py bses
+```

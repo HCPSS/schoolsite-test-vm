@@ -1,1 +1,2 @@
-from optionresolver import OptionResolver
+from lib.backupoptionresolver import BackupOptionResolver
+from lib.resetparamresolver import ResetParamResolver

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os, shutil, tarfile
-from lib import OptionResolver
+from lib import BackupOptionResolver
 
-options = OptionResolver()
+options = BackupOptionResolver()
 
 class DrupalSourceMover(object):    
     def __init__(self, tar_location, school_code):

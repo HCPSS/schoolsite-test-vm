@@ -1,6 +1,6 @@
-import optparse, yaml, os
+import optparse, os
 
-class OptionResolver(object):
+class BackupOptionResolver(object):
     """Resolve user input options"""
     
     def __init__(self):
