@@ -129,3 +129,42 @@ Then you should be able to:
 ```
 $ vagrant up
 ```
+
+## Utilities
+
+The utilities folder contains scripts that help perform various tedious tasks.
+
+### process_backup.py
+
+This is a python script that organizes a backup folder which is organized like 
+this:
+
+```
+/backup_location/
+  es/
+    site_es_aes-2016-01-15.bak.sql.gz
+    site_es_aes-2016-01-15.tar.gz
+  hs/
+    site_hs_ahs-2016-01-15.bak.sql.gz
+    site_hs_ahs-2016-01-15.tar.gz 
+```
+
+And makes it like this:
+
+```
+/destination/
+  data/
+    aes/
+      <drupal-files>
+    ahs/
+      <drupal-files>
+  database/
+    aes.bak.sql.gz
+    ahs.bak.sql.gz
+```
+
+Which is what ansible will expect. Here's an example:
+
+```
+$ ./utilities/process_backup.py -b ~/Downloads/2016-01-15/ -d ~/Sites/schoolsite-test-vm/
+```
