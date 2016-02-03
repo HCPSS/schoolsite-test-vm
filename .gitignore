@@ -2,6 +2,8 @@
 nbproject/
 .project
 .pydevproject
+.buildpath
+.settings/
 
 /database/*
 /data/*
