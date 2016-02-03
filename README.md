@@ -130,6 +130,19 @@ Then you should be able to:
 $ vagrant up
 ```
 
+## Usage
+
+If you are going active development on a theme of module, you can place it in
+extensions/modules or extensions/themes. After provisioning the vagrant box, 
+you can place the module or theme in it's installation location with a symbolic
+link like this:
+
+```
+$ ln -s \
+    /vagrant/extensions/modules/my_module \
+    /var/www/schools/bses/sites/all/modules/my_module
+```
+
 ## Utilities
 
 The utilities folder contains scripts that help perform various tedious tasks.
