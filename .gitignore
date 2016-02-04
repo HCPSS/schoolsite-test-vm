@@ -1,3 +1,4 @@
+# Do not commit specific development, editor, and IDE files
 .vagrant/
 nbproject/
 .project
@@ -5,9 +6,13 @@ nbproject/
 .buildpath
 .settings/
 
+# Do not commit the database SQL dumps and Drupal sites.  Retain the two
+# folder's README.md files
 /database/*
 /data/*
 
 !/database/README.md
 !/data/README.md
 
+# Do not commit compiled Python bytecode
+*.pyc
