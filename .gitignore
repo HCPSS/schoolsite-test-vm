@@ -16,3 +16,8 @@ nbproject/
 
 # Do not commit compiled Python bytecode
 *.pyc
+
+# Do not commit downloaded Ansible Galaxy roles.  We'll need to adjust the
+# `roles/*` rule if we add custom roles in the future.
+/ansible/ansible.cfg
+/ansible/roles/*

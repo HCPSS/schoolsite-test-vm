@@ -4,8 +4,22 @@ A Vagrant virtual machine that provisions and configures
 
 ## Requirements
 
-Ansible and the ansible roles listed in ansible/requirements.yml. Install them 
-with:
+### Ansible
+
+Ansible roles are listed in ansible/requirements.yml and can be installed using
+`ansible-galaxy`.  Roles can be installed at the host-level or bundled into your
+local working copy of the repository. If you choose the latter option, add an
+empty ansible/roles folder and an ansible.cfg file at ansible/ansible.cfg.
+
+Your ansible.cfg file should look like:
+
+```
+[defaults]
+
+roles_path = <your path>/schoolsite-test-vm/ansible/roles
+```
+
+Install the roles with:
 
 ```
 $ ansible-galaxy install -r ansible/requirements.yml
@@ -133,7 +147,7 @@ $ vagrant up
 ## Usage
 
 If you are going active development on a theme of module, you can place it in
-extensions/modules or extensions/themes. After provisioning the vagrant box, 
+extensions/modules or extensions/themes. After provisioning the vagrant box,
 you can place the module or theme in it's installation location with a symbolic
 link like this:
 
@@ -149,7 +163,7 @@ The utilities folder contains scripts that help perform various tedious tasks.
 
 ### process_backup.py
 
-This is a python script that organizes a backup folder which is organized like 
+This is a python script that organizes a backup folder which is organized like
 this:
 
 ```
@@ -159,7 +173,7 @@ this:
     site_es_aes-2016-01-15.tar.gz
   hs/
     site_hs_ahs-2016-01-15.bak.sql.gz
-    site_hs_ahs-2016-01-15.tar.gz 
+    site_hs_ahs-2016-01-15.tar.gz
 ```
 
 And makes it like this:
