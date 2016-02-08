@@ -2,15 +2,18 @@
 school_shortnames:
   - aes
   - ahs
+  - arl
   - bbes
   - bbms
   - bmms
   - bpes
   - bses
+  - bwes
   - cces
   - ces
   - chs
   - cles
+  - cls
   - cms
   - cres
   - dles
@@ -27,6 +30,8 @@ school_shortnames:
   - ges
   - ghs
   - gms
+  - hc
+  - hcasc
   - hcms
   - hes
   - hhs
@@ -48,6 +53,7 @@ school_shortnames:
   - mwes
   - mwms
   - nes
+  - nto
   - omhs
   - omms
   - ples
@@ -58,6 +64,7 @@ school_shortnames:
   - res
   - rhhs
   - rhs
+  - sch
   - ses
   - sfes
   - sjles

@@ -44,6 +44,7 @@ didn't like that idea, so I added all this to my /etc/hosts file:
 192.168.33.2 bmms.schools.dev
 192.168.33.2 bpes.schools.dev
 192.168.33.2 bses.schools.dev
+192.168.33.2 bwes.schools.dev
 192.168.33.2 cces.schools.dev
 192.168.33.2 ces.schools.dev
 192.168.33.2 chs.schools.dev
@@ -66,6 +67,7 @@ didn't like that idea, so I added all this to my /etc/hosts file:
 192.168.33.2 ghs.schools.dev
 192.168.33.2 gms.schools.dev
 192.168.33.2 hc.schools.dev
+192.168.33.2 hcasc.schools.dev
 192.168.33.2 hcms.schools.dev
 192.168.33.2 hes.schools.dev
 192.168.33.2 hhs.schools.dev
