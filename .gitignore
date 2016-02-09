@@ -10,9 +10,14 @@ nbproject/
 # folder's README.md files
 /database/*
 /data/*
-
 !/database/README.md
 !/data/README.md
+
+# Do not commit the development modules and themes, but keep the README files.
+/extensions/themes/*
+/extensions/modules/*
+!/extensions/themes/README.md
+!/extensions/modules/README.md
 
 # Do not commit compiled Python bytecode
 *.pyc
