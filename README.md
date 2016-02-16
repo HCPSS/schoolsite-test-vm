@@ -229,10 +229,16 @@ For instance, this would clear caches on all schools:
 $ /vagrant/utilities/batch_command.py "drush cc all"
 ```
 
-You can also use token *target* to substitute the target directory. For 
-instance, this will add a module you are developing to all schools as a symbolic
-link:
+You can also use tokens *target* and *school_code* to substitute the target 
+directory. For instance, this will add a module you are developing to all 
+schools as a symbolic link:
 
 ```
 $ /vagrant/utilities/batch_command.py "ln -sfn /vagrant/extensions/modules/mymodule {target}/sites/all/modules/mymodule"
+```
+
+And this will revert all schools to thier original state:
+
+```
+$ /vagrant/utilities/batch_command.py "/vagrant/utilities/reset_school.py {school_code}"
 ```
