@@ -219,3 +219,20 @@ guest and it uses the actual vhost entries to generate the list.
 ```
 $ /vagrant/utilities/hosts_example.py
 ```
+
+### batch_command.py
+
+Iterates over the school installations and performs the command on all of them.
+For instance, this would clear caches on all schools:
+
+```
+$ /vagrant/utilities/batch_command.py "drush cc all"
+```
+
+You can also use token *target* to substitute the target directory. For 
+instance, this will add a module you are developing to all schools as a symbolic
+link:
+
+```
+$ /vagrant/utilities/batch_command.py "ln -sfn /vagrant/extensions/modules/mymodule {target}/sites/all/modules/mymodule"
+```
