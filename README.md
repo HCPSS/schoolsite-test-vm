@@ -25,6 +25,8 @@ Install the roles with:
 $ ansible-galaxy install -r ansible/requirements.yml
 ```
 
+You may need a *sudo* on the front or a *--force* on the end.
+
 ## Setup
 
 ### Hosts file
