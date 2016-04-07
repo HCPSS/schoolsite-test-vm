@@ -81,3 +81,8 @@
         "admin"
       with_items: "{{ data_directories.stdout_lines }}"
       ignore_errors: yes
+      
+    - name: Install some random untilities
+      apt: name={{ item }}
+      with_items:
+        - unzip
