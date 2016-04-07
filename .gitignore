@@ -26,3 +26,7 @@ nbproject/
 # `roles/*` rule if we add custom roles in the future.
 /ansible/ansible.cfg
 /ansible/roles/*
+
+# Do not commit provision playbook retries
+/ansible/*.retry
+
