@@ -1,0 +1,35 @@
+version: '2'
+services:
+
+  drupal_db:
+    container_name: drupal_db
+    image: bander2/drupal-mysql
+    volumes:
+      - "./database:/seed"
+      - "./config/import.sh:/docker-entrypoint-initdb.d/import.sh"
+      - "./config/process.sh:/process.sh"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  school_web:
+    container_name: school_web
+    #build: ./docker/school_web
+    image: banderson/drupal-multi
+    volumes:
+      - "./data:/var/www/html"
+    ports:
+      - 80:80
+    depends_on:
+      - drupal_db
+    links:
+      - drupal_db
+
+  # dns:
+  #   container_name: school_dns
+  #   image: andyshinn/dnsmasq
+  #   ports:
+  #     - 53:53/tcp
+  #     - 53:53/udp
+  #   cap_add:
+  #     - NET_ADMIN
+  #   command: -S /dev/127.0.0.1

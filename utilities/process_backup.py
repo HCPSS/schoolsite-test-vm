@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-import os, shutil, tarfile
+from __future__ import print_function
+import os, shutil, tarfile, sys
 from lib import BackupOptionResolver
 from multiprocessing import Process
 import tempfile
+import gzip
 
 options = BackupOptionResolver()
 
@@ -25,7 +27,7 @@ class DrupalSourceMover(object):
             temp_dir,
             "var",
             "www",
-            "{0}.hcpss.org".format(self.school_code)
+            "{0}.hcpss.org".format(self.school_code.replace("_", "-"))
         )
 
         candidates = [
@@ -48,7 +50,7 @@ class DrupalSourceMover(object):
         tar.extractall(temp_dir)
         tar.close()
 
-        drupal = self.find_drupal_install(temp_dir);
+        drupal = self.find_drupal_install(temp_dir)
 
         # Sometimes the archive is empty and copytree throws an error so we just
         # want to make sure it exists first.
@@ -58,17 +60,25 @@ class DrupalSourceMover(object):
             # destination does not exist before we copy it.
             if not os.path.isdir(destination):
                 shutil.copytree(drupal, destination)
+            else:
+                print("Duplicate installtion found for {0}".format(school_code), file=sys.stderr)
+        else:
+            print("Could not find Drupal installation for {0}".format(school_code), file=sys.stderr)
 
         shutil.rmtree(temp_dir)
 
-def move_sql(school_code):
+def move_sql(path, school_code):
     """Move the SQL tarball
     :type school_code: String - The school code.
     """
-    directory = os.path.join(options.destination(), school_code)
-    filename = "{0}.bak.sql.gz".format(school_code)
+    gz = gzip.open(path, "rb")
+    directory = os.path.join(options.destination(), "database")
     create_path(directory)
-    shutil.copy(path, os.path.join(directory, filename))
+    sql = open(os.path.join(directory, "{0}.bak.sql".format(school_code)), "wb")
+    sql.write(gz.read())
+    sql.close()
+    gz.close()
+
     print("Moved SQL for {0}".format(school_code))
 
 def move_data(path, school_code):
@@ -77,9 +87,9 @@ def move_data(path, school_code):
     :type school_code: String - The school code.
     """
     drupal = DrupalSourceMover(path, school_code)
-    directory = os.path.join(options.destination(), school_code)
+    directory = os.path.join(options.destination(), "data")
     create_path(directory)
-    drupal.move(os.path.join(directory, "drupal"))
+    drupal.move(os.path.join(directory, school_code))
     print("Moved data for {0}".format(school_code))
 
 def create_path(path):
@@ -98,7 +108,7 @@ def process_file(filename, path, school_code):
     :type school_code: String - The school code.
     """
     if (filename.endswith(".sql.gz")):
-        move_sql(school_code)
+        move_sql(path, school_code)
     elif (filename.endswith(".tar.gz")):
         move_data(path, school_code)
 
@@ -107,7 +117,6 @@ for subdir, dirs, files in os.walk(options.backup_location()):
     for filename in files:
         path = os.path.join(subdir, filename)
         school_code = filename.split("-")[0].split("_", 2)[-1]
-
 
         if school_code == "school":
             # Indicative of a test site

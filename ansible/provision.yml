@@ -2,87 +2,124 @@
 - name: Schoolsite Feature Migrate
   hosts: all
   sudo: yes
-  
-  vars_files:
-    - vars/apache.yml
-    - vars/php.yml
-    - vars/mysql.yml
-  
-  vars:
-    drush_version: 7.x
-  
-  roles:
-    - role: geerlingguy.apache
-    - role: geerlingguy.mysql
-    - role: geerlingguy.php
-    - role: geerlingguy.drush
 
   pre_tasks:
     - name: Register drupal installations
       shell: "find /vagrant/data -maxdepth 1 -mindepth 1 -type d | cut -f4 -d'/'"
       register: data_directories
-      
-    - name: Register database names
-      shell: "find /vagrant/database -maxdepth 1 -mindepth 1 -type f | grep bak.sql.gz | cut -f4 -d'/' | cut -f1 -d'.'"
-      register: database_names
-  
-    - name: Format a list of the school shortnames to make vhosts
-      set_fact:
-        vhost:
-          servername: "{{ item }}.schools.dev"
-          documentroot: "/var/www/schools/{{ item }}"
-      with_items: "{{ data_directories.stdout_lines }}"
-      register: vhost_result
-        
-    - name: Set the vhosts from school shortnames
-      set_fact: 
-        apache_vhosts: "{{ vhost_result.results | map(attribute='ansible_facts.vhost') | list }}"
+
   tasks:
-    - name: Create a symbolic for the school sites
-      file: src=/vagrant/data dest=/var/www/schools state=link
-      notify: restart apache
-      
-    - name: Write settings files
-      template:
-        src: templates/settings.php.j2
-        dest: /var/www/schools/{{ item }}/sites/default/settings.php
-      with_items: "{{ data_directories.stdout_lines }}"
-      
-    - name: Remove databases
-      mysql_db: 
-        state: absent 
-        name: "{{ item }}"
-        login_user: root
-        login_password: root
-      with_items: "{{ database_names.stdout_lines }}"
-      
-    - name: Create databases
-      mysql_db: 
-        state: present 
-        name: "{{ item }}"
-        login_user: root
-        login_password: root
-      with_items: "{{ database_names.stdout_lines }}"
-      
-    - name: Import databases
-      mysql_db:
-        state: import
-        name: "{{ item }}"
-        target: /vagrant/database/{{ item }}.bak.sql.gz
-        login_user: root
-        login_password: root
-      with_items: "{{ database_names.stdout_lines }}"
-      
-    - name: Update the admin passwords
-      command: drush upwd 
-        --password="admin" 
-        --root="/var/www/schools/{{ item }}" 
-        --uri="http://{{ item }}.schools.dev"
-        "admin"
-      with_items: "{{ data_directories.stdout_lines }}"
-      ignore_errors: yes
-      
-    - name: Install some random untilities
-      apt: name={{ item }}
-      with_items:
-        - unzip
+    - name: Install PIP
+      apt: name=python-pip update_cache=yes cache_valid_time=3600
+
+    - name: Install docker-py
+      pip: name=docker-py version=1.9.0
+
+    # - name: Start the mysql container
+    #   docker_container:
+    #     name: "school_db"
+    #     image: mysql
+    #     volumes:
+    #       - /vagrant/database:/seed
+    #       - /vagrant/ansible/script/import.sh:/docker-entrypoint-initdb.d/import.sh
+    #     env:
+    #       MYSQL_ROOT_PASSWORD: root
+    #
+    # - name: Make a place to put vhosts
+    #   file: path=/srv/vhosts state=directory
+    #
+    # - name: Create vhosts
+    #   template: src=templates/vhosts.conf.j2 dest=/srv/vhosts/{{ item }}.conf
+    #   with_items: "{{ data_directories.stdout_lines }}"
+    #
+    # - name: Start the apache container
+    #   docker_container:
+    #     name: school_web
+    #     image: bander2/drupal-php-apache
+    #     volumes:
+    #       - /vagrant/data:/var/www/html
+    #       - /srv/vhosts:/etc/apache2/sites-enabled
+    #     ports:
+    #       - 80:80
+    #     links:
+    #       - school_db:drupal
+
+
+
+    # - name: Start the nginx proxy
+    #   docker_container:
+    #     name: school_proxy
+    #     image: jwilder/nginx-proxy
+    #     ports: ["80:80"]
+    #     volumes:
+    #       - /var/run/docker.sock:/tmp/docker.sock
+    #
+    # - name: Start the apache containers
+    #   docker_container:
+    #     name: "{{ item.1 }}_web"
+    #     image: bander2/drupal-php-apache
+    #     volumes:
+    #       - /vagrant/data/{{ item.1 }}/drupal:/var/www/html
+    #     ports:
+    #       - "{{ 8000 + item.0 }}:80"
+    #     env:
+    #       VIRTUAL_HOST: "{{ item.1 }}.schools.dev"
+    #   with_indexed_items: "{{ data_directories.stdout_lines }}"
+
+
+
+
+
+
+    #
+    #
+    #
+    #
+    # - name: Create a symbolic for the school sites
+    #   file: src=/vagrant/data dest=/var/www/schools state=link
+    #   notify: restart apache
+    #
+    # - name: Write settings files
+    #   template:
+    #     src: templates/settings.php.j2
+    #     dest: /var/www/schools/{{ item }}/sites/default/settings.php
+    #   with_items: "{{ data_directories.stdout_lines }}"
+    #
+    # - name: Remove databases
+    #   mysql_db:
+    #     state: absent
+    #     name: "{{ item }}"
+    #     login_user: root
+    #     login_password: root
+    #   with_items: "{{ database_names.stdout_lines }}"
+    #
+    # - name: Create databases
+    #   mysql_db:
+    #     state: present
+    #     name: "{{ item }}"
+    #     login_user: root
+    #     login_password: root
+    #   with_items: "{{ database_names.stdout_lines }}"
+    #
+    # - name: Import databases
+    #   mysql_db:
+    #     state: import
+    #     name: "{{ item }}"
+    #     target: /vagrant/database/{{ item }}.bak.sql.gz
+    #     login_user: root
+    #     login_password: root
+    #   with_items: "{{ database_names.stdout_lines }}"
+    #
+    # - name: Update the admin passwords
+    #   command: drush upwd
+    #     --password="admin"
+    #     --root="/var/www/schools/{{ item }}"
+    #     --uri="http://{{ item }}.schools.dev"
+    #     "admin"
+    #   with_items: "{{ data_directories.stdout_lines }}"
+    #   ignore_errors: yes
+    #
+    # - name: Install some random untilities
+    #   apt: name={{ item }}
+    #   with_items:
+    #     - unzip

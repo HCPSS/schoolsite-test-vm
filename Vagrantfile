@@ -2,11 +2,11 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "williamyeh/ubuntu-trusty64-docker"
   config.vm.network "private_network", ip: "192.168.33.2"
 
   config.vm.synced_folder "./", "/vagrant", :nfs => true
-  
+
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "4096"
     vb.customize ["modifyvm", :id, "--cpus", 8]
