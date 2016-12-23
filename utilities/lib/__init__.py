@@ -1,3 +1,4 @@
 from lib.backupoptionresolver import BackupOptionResolver
 from lib.resetparamresolver import ResetParamResolver
 from lib.batchcommandparamresolver import BatchCommandParamResolver
+from lib.schoolmover import SchoolMover
