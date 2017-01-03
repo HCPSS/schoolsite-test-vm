@@ -8,4 +8,9 @@ twit \
     -p '{"schoolcode": '"\"$SCHOOLCODE\""'}' \
     --no-escape
 
+drush upwd \
+    --root=/var/www/html \
+    --uri=$SCHOOLCODE.schools.dev \
+    --password="admin" "admin"
+
 exec "$@"
