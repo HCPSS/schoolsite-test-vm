@@ -26,7 +26,8 @@ class SchoolMover(object):
 
         # The backup files do not have a database name in them. In order to
         # easily import the files, we want to add that.
-        sql_string = "CREATE DATABASE {0};\nUSE {0};\n{1}".format(
+        sql_string = "-- {0}\nCREATE DATABASE {1};\nUSE {1};\n\n{2}".format(
+            "Added by backup processor",
             self.code,
             sql_string)
 
