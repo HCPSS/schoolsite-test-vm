@@ -2,15 +2,15 @@
 - name: Schoolsite Feature Migrate
   hosts: all
   sudo: yes
-  
+
   vars_files:
     - vars/apache.yml
     - vars/php.yml
     - vars/mysql.yml
-  
+
   vars:
     drush_version: 7.x
-  
+
   roles:
     - role: geerlingguy.apache
     - role: geerlingguy.mysql
@@ -21,11 +21,11 @@
     - name: Register drupal installations
       shell: "find /vagrant/data -maxdepth 1 -mindepth 1 -type d | cut -f4 -d'/'"
       register: data_directories
-      
+
     - name: Register database names
-      shell: "find /vagrant/database -maxdepth 1 -mindepth 1 -type f | grep bak.sql.gz | cut -f4 -d'/' | cut -f1 -d'.'"
+      shell: "find /vagrant/database -maxdepth 1 -mindepth 1 -type f | grep bak.sql | cut -f4 -d'/' | cut -f1 -d'.'"
       register: database_names
-  
+
     - name: Format a list of the school shortnames to make vhosts
       set_fact:
         vhost:
@@ -33,56 +33,65 @@
           documentroot: "/var/www/schools/{{ item }}"
       with_items: "{{ data_directories.stdout_lines }}"
       register: vhost_result
-        
+
     - name: Set the vhosts from school shortnames
-      set_fact: 
+      set_fact:
         apache_vhosts: "{{ vhost_result.results | map(attribute='ansible_facts.vhost') | list }}"
   tasks:
     - name: Create a symbolic for the school sites
       file: src=/vagrant/data dest=/var/www/schools state=link
       notify: restart apache
-      
+
     - name: Write settings files
       template:
         src: templates/settings.php.j2
         dest: /var/www/schools/{{ item }}/sites/default/settings.php
       with_items: "{{ data_directories.stdout_lines }}"
-      
+
     - name: Remove databases
-      mysql_db: 
-        state: absent 
-        name: "{{ item }}"
-        login_user: root
-        login_password: root
-      with_items: "{{ database_names.stdout_lines }}"
-      
-    - name: Create databases
-      mysql_db: 
-        state: present 
-        name: "{{ item }}"
-        login_user: root
-        login_password: root
-      with_items: "{{ database_names.stdout_lines }}"
-      
-    - name: Import databases
       mysql_db:
-        state: import
+        state: absent
         name: "{{ item }}"
-        target: /vagrant/database/{{ item }}.bak.sql.gz
         login_user: root
         login_password: root
       with_items: "{{ database_names.stdout_lines }}"
-      
+
+    - name: Import the databases
+      shell: mysql -uroot -proot < /vagrant/database/{{ item }}.bak.sql
+      with_items: "{{ database_names.stdout_lines }}"
+
     - name: Update the admin passwords
-      command: drush upwd 
-        --password="admin" 
-        --root="/var/www/schools/{{ item }}" 
+      command: drush upwd
+        --password="admin"
+        --root="/var/www/schools/{{ item }}"
         --uri="http://{{ item }}.schools.dev"
         "admin"
       with_items: "{{ data_directories.stdout_lines }}"
       ignore_errors: yes
-      
+
     - name: Install some random untilities
       apt: name={{ item }}
       with_items:
         - unzip
+
+    - name: Install Java
+      apt: name=default-jdk
+
+    - name: Check if elasticsearch is installed
+      command: dpkg-query -W elasticsearch
+      register: elasticsearch_check_deb
+      failed_when: elasticsearch_check_deb.rc > 1
+      changed_when: elasticsearch_check_deb.rc == 1
+
+    - name: Download elasticsearch package
+      get_url:
+        url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.deb
+        dest: /elasticsearch.deb
+      when: elasticsearch_check_deb.rc == 1
+
+    - name: Install elasticsearch
+      apt: deb="/elasticsearch.deb"
+      when: elasticsearch_check_deb.rc == 1
+
+    - name: Start elasticsearch
+      service: name=elasticsearch enabled=yes
