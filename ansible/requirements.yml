@@ -3,3 +3,4 @@
 - src: geerlingguy.mysql
 - src: geerlingguy.php
 - src: geerlingguy.drush
+- src: geerlingguy.composer

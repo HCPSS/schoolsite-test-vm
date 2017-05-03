@@ -9,13 +9,14 @@
     - vars/mysql.yml
 
   vars:
-    drush_version: 7.x
+    # drush_version: 7.x
 
   roles:
     - role: geerlingguy.apache
     - role: geerlingguy.mysql
     - role: geerlingguy.php
     - role: geerlingguy.drush
+    - role: geerlingguy.composer
 
   pre_tasks:
     - name: Register drupal installations
