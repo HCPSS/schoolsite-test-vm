@@ -59,7 +59,7 @@ class SchoolMover(object):
                     os.path.join(self.destination, "data", self.code))
 
         else:
-            print("there is no drupal data")
+            print("there is no drupal data in {0}".format(self.code))
 
         shutil.rmtree(temp_dir)
 
