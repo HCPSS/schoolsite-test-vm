@@ -23,27 +23,44 @@ if [ "$PROXYRUNNING" != "true" ]; then
     sleep 1
 fi
 
+# Is elasticsearch running?
+ELASTICRUNNING=`docker inspect -f {{.State.Running}} school_elasticsearch 2> /dev/null`
+if [ "$ELASTICRUNNING" != "true" ]; then
+	echo "+++++++++++++++++ Start Elasticsearch"
+	docker run -d --name school_elasticsearch \
+		-p 9200:9200 \
+		-e "http.host=0.0.0.0" \
+		-e "transport.host=127.0.0.1" \
+		docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+fi
+
 # Start the DB
+echo "+++++++++++++++++ Start MySQL"
 docker run -d \
     --name ${SCHOOL}_db \
     -e MYSQL_ROOT_PASSWORD=root \
     -v $PROJECTDIR/database/$SCHOOL.bak.sql:/docker-entrypoint-initdb.d/$SCHOOL.bak.sql \
+    -v $PROJECTDIR/.data/$SCHOOL:/var/lib/mysql \
     mysql --max-allowed-packet=64M
 
 # Does the web image exist?
 if [[ "$(docker images -q school_web:latest 2> /dev/null)" == "" ]]; then
+	echo "+++++++++++++++++ Build Web"
     docker build -t school_web $PROJECTDIR/docker/web
 fi
 
 # Wait for the database to be ready for connections before we start the web container.
 while ! is_db_ready; do
+	echo "+++++++++++++++++ Waiting..."
     sleep 1
 done
 
 # Start the web container.
+echo "+++++++++++++++++ Start Web"
 docker run -d \
     --name ${SCHOOL}_web \
     --link ${SCHOOL}_db:drupal_db \
+	--link school_elasticsearch:elasticsearch \
     -e SCHOOLCODE=$SCHOOL \
     -e VIRTUAL_HOST=$SCHOOL.schools.dev \
     -v $PROJECTDIR/data/$SCHOOL:/var/www/html \

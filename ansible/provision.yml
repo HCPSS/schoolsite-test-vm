@@ -8,9 +8,6 @@
     - vars/php.yml
     - vars/mysql.yml
 
-  vars:
-    # drush_version: 7.x
-
   roles:
     - role: geerlingguy.apache
     - role: geerlingguy.mysql
@@ -75,24 +72,7 @@
       with_items:
         - unzip
 
-    - name: Install Java
-      apt: name=default-jdk
-
-    - name: Check if elasticsearch is installed
-      command: dpkg-query -W elasticsearch
-      register: elasticsearch_check_deb
-      failed_when: elasticsearch_check_deb.rc > 1
-      changed_when: elasticsearch_check_deb.rc == 1
-
-    - name: Download elasticsearch package
-      get_url:
-        url: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.deb
-        dest: /elasticsearch.deb
-      when: elasticsearch_check_deb.rc == 1
-
-    - name: Install elasticsearch
-      apt: deb="/elasticsearch.deb"
-      when: elasticsearch_check_deb.rc == 1
-
-    - name: Start elasticsearch
-      service: name=elasticsearch enabled=yes
+    - name: Set host for search
+      lineinfile:
+        path: /etc/hosts
+        line: 192.168.33.5 searchapi.hocoschools.org
