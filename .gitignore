@@ -30,3 +30,6 @@ nbproject/
 # Do not commit provision playbook retries
 /ansible/*.retry
 
+# Docker stuff
+ubuntu-xenial-16.04-cloudimg-console.log
+.data
