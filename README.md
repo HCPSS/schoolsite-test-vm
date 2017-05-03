@@ -204,8 +204,23 @@ schools as a symbolic link:
 $ /vagrant/utilities/batch_command.py "ln -sfn /vagrant/extensions/modules/mymodule {target}/sites/all/modules/mymodule"
 ```
 
-And this will revert all schools to thier original state:
+And this will revert all schools to their original state:
 
 ```
 $ /vagrant/utilities/batch_command.py "/vagrant/utilities/reset_school.py {school_code}"
+```
+
+### elasticsearch.sh and elasticsearch_hs.sh
+
+Only works for Vagrant currently.
+
+Perform deployments for version 1.9 of the school deployment module for ES/MS
+and HS sites respectively.
+
+For ES/MS sites, you first need to update schoolsite_deploy and for HS sites,
+you need to update schoolsite_deploy and hcpss_schoolsite_theme. Then
+
+```
+/vagrant/utilities/elasticsearch.sh fres_test
+/vagrant/utilities/elasticsearch_hs.sh omhs
 ```
